@@ -31,12 +31,12 @@ public class fragment1 extends Fragment {
         return view;
     }
 
-    public void setLocalCodecs(List<String> list) {
+    public void setLocalCodecs(List<Integer> list) {
         String str = "";
         if (list.size() > 0) {
 
-            for (String item : list) {
-                str = str + item + ", ";
+            for (int item : list) {
+                str = str + Codec.getCodecName(item) + ", ";
             }
             str = str.substring(0, str.length() - 2);
         } else{
@@ -46,12 +46,12 @@ public class fragment1 extends Fragment {
     }
 
 
-    public void setSelectableCodecs(List<String> list){
+    public void setSelectableCodecs(List<Integer> list){
         String str = "";
         if (list.size() > 0) {
 
-            for (String item : list) {
-                str = str + item + ", ";
+            for (int item : list) {
+                str = str + Codec.getCodecName(item) + ", ";
             }
             str = str.substring(0, str.length() - 2);
         } else{

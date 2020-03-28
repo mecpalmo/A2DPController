@@ -22,26 +22,20 @@ public class Codec {
     public static final int BITS_PER_SAMPLE_24   = 0x1 << 1;
     public static final int BITS_PER_SAMPLE_32   = 0x1 << 2;
 
-    private static final String[] CODEC_TYPES = {"SBC","AAC","aptX","aptX HD","LDAC","MAX"};
+    Codec(){ }
 
-    Codec(){
-
-    }
-
-    public static String getCodecType(int i){
-        switch(i){
+    public static String getCodecName(int mCodecType) {
+        switch (mCodecType) {
             case SOURCE_CODEC_TYPE_SBC:
-                return CODEC_TYPES[0];
+                return "SBC";
             case SOURCE_CODEC_TYPE_AAC:
-                return CODEC_TYPES[1];
+                return "AAC";
             case SOURCE_CODEC_TYPE_APTX:
-                return CODEC_TYPES[2];
+                return "aptX";
             case SOURCE_CODEC_TYPE_APTX_HD:
-                return CODEC_TYPES[3];
+                return "aptX HD";
             case SOURCE_CODEC_TYPE_LDAC:
-                return CODEC_TYPES[4];
-            case SOURCE_CODEC_TYPE_MAX:
-                return CODEC_TYPES[5];
+                return "LDAC";
             default:
                 return "ERROR";
         }

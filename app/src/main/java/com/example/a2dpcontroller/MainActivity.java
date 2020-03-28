@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothAdapter;
+import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -21,7 +22,8 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
 
     private static final String TAG = "MyApp";
     private BluetoothAdapter mAdapter;
-    public CodecController codecController;
+    private CodecController codecController;
+    private BluetoothA2DPRequester a2DPRequester;
 
     private fragment1 fragment;
     private TextView textView1;
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
         codecController = new CodecController();
         setViewComponents();
@@ -49,8 +52,8 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
     public void initiateBluetoothAdapter(){
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mAdapter.isEnabled()) {
-            new BluetoothA2DPRequester(this).request(this, mAdapter);
-            getAllInfo();
+            a2DPRequester = new BluetoothA2DPRequester(this);
+            a2DPRequester.request(this, mAdapter);
         }
     }
 
@@ -63,14 +66,12 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
         button1 = (Button)findViewById(R.id.button1);
         button2 = (Button)findViewById(R.id.button2);
         button2.setEnabled(false);
-
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 setDesiredCodec();
             }
         });
-
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
         progressBar.setMax(ProgressBarInfo.MAX_VALUE_QUALITY);
     }
@@ -81,36 +82,15 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
     }
 
     private void getCurrentCodec(){
-        String codec = codecController.getCurrentCodec();
-        if(codec == Codec.getCodecType(Codec.SOURCE_CODEC_TYPE_LDAC)){
-            progressBar.setProgress(ProgressBarInfo.LDAC_QUALITY);
-            textView1.setText("LDAC");
-        }else if(codec == Codec.getCodecType(Codec.SOURCE_CODEC_TYPE_APTX_HD)){
-            progressBar.setProgress(ProgressBarInfo.APTXHD_QUALITY);
-            textView1.setText("aptX HD");
-        }else if(codec == Codec.getCodecType(Codec.SOURCE_CODEC_TYPE_APTX)){
-            progressBar.setProgress(ProgressBarInfo.APTX_QUALITY);
-            textView1.setText("aptX");
-        }else if(codec == Codec.getCodecType(Codec.SOURCE_CODEC_TYPE_AAC)){
-            progressBar.setProgress(ProgressBarInfo.AAC_QUALITY);
-            textView1.setText("AAC");
-        }else if(codec == Codec.getCodecType(Codec.SOURCE_CODEC_TYPE_SBC)){
-            progressBar.setProgress(ProgressBarInfo.SBC_QUALITY);
-            textView1.setText("SBC");
-        }else{
-            progressBar.setProgress(0);
-            textView1.setText("None");
-        }
-        if(progressBar.getProgress() >= ProgressBarInfo.GREEN_BORDER){
-            progressBar.setProgressTintList(ColorStateList.valueOf(Color.GREEN));
-            textView4.setText("Quality: Very Good");
-        }else if(progressBar.getProgress() >= ProgressBarInfo.YELLOW_BORDER){
-            textView4.setText("Quality: Good");
-            progressBar.setProgressTintList(ColorStateList.valueOf(Color.YELLOW));
-        }else if(progressBar.getProgress() >= ProgressBarInfo.RED_BORDER){
-            textView4.setText("Quality: Weak");
-            progressBar.setProgressTintList(ColorStateList.valueOf(Color.RED));
-        }
+        int codec = codecController.getCurrentCodec();
+        Log.i("MYAPP","Codec: "+codec);
+
+        textView1.setText(Codec.getCodecName(codec));
+
+        progressBar.setProgress(ProgressBarInfo.LDAC_QUALITY);
+        textView4.setText("Quality: Very Good");
+        progressBar.setProgressTintList(ColorStateList.valueOf(ProgressBarInfo.getColor(progressBar.getProgress())));
+
         switch (codecController.getSAMPLE_RATE()){
             case Codec.SAMPLE_RATE_44100:
                 textView2.setText("Sample Rate: 44100 Hz");
@@ -146,7 +126,8 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
             default:
                 textView3.setText("Bits Per Sample: None");
         }
-        if(codec == Codec.getCodecType(MAX_SOURCE_CODEC_TYPE)){
+
+        if(codec == MAX_SOURCE_CODEC_TYPE){
             textView1.setForegroundTintList(ColorStateList.valueOf(Color.GREEN));
             button2.setEnabled(false);
         }else{
@@ -156,26 +137,26 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
     }
 
     private void getPossibleCodecs(){
-        List<String> localCodecs = codecController.getLocalCodecs();
-        LinkedHashSet<String> hashSet = new LinkedHashSet<>(localCodecs);
-        List<String> LocalCodecs = new ArrayList<>(hashSet);
+        List<Integer> localCodecs = codecController.getLocalCodecs();
+        LinkedHashSet<Integer> hashSet = new LinkedHashSet<>(localCodecs);
+        List<Integer> LocalCodecs = new ArrayList<>(hashSet);
         fragment.setLocalCodecs(LocalCodecs);
 
-        List<String> selectableCodecs = codecController.getSelectableCodecs();
-        LinkedHashSet<String> hashSet2 = new LinkedHashSet<>(selectableCodecs);
-        List<String> SelectableCodecs = new ArrayList<>(hashSet2);
+        List<Integer> selectableCodecs = codecController.getSelectableCodecs();
+        LinkedHashSet<Integer> hashSet2 = new LinkedHashSet<>(selectableCodecs);
+        List<Integer> SelectableCodecs = new ArrayList<>(hashSet2);
         setMAX_SOURCE_CODEC_TYPE(SelectableCodecs);
         fragment.setLocalCodecs(SelectableCodecs);
     }
 
-    private void setMAX_SOURCE_CODEC_TYPE(List<String> list){
-        if(list.contains(Codec.getCodecType(Codec.SOURCE_CODEC_TYPE_LDAC))){
+    private void setMAX_SOURCE_CODEC_TYPE(List<Integer> list){
+        if(list.contains(Codec.SOURCE_CODEC_TYPE_LDAC)){
             MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_LDAC;
-        }else if(list.contains(Codec.getCodecType(Codec.SOURCE_CODEC_TYPE_APTX_HD))){
+        }else if(list.contains(Codec.SOURCE_CODEC_TYPE_APTX_HD)){
             MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_APTX_HD;
-        }else if(list.contains(Codec.getCodecType(Codec.SOURCE_CODEC_TYPE_APTX))){
+        }else if(list.contains(Codec.SOURCE_CODEC_TYPE_APTX)){
             MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_APTX;
-        }else if(list.contains(Codec.getCodecType(Codec.SOURCE_CODEC_TYPE_AAC))){
+        }else if(list.contains(Codec.SOURCE_CODEC_TYPE_AAC)){
             MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_AAC;
         }else{
             MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_SBC;
@@ -203,8 +184,19 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
     }
 
     @Override
+    public void onBluetoothError() {
+        setDefaultText();
+    }
+
+    @Override
     public void onBluetoothDisconnected() {
         setDefaultText();
+    }
+
+    @Override
+    public void onA2DPProxyReceived(BluetoothA2dp proxy){
+        codecController.setA2dp(proxy);
+        getAllInfo();
     }
 
 }

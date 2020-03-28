@@ -60,8 +60,13 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver {
 
         switch (state) {
             case BluetoothAdapter.STATE_CONNECTED:
+                Log.i(TAG, "onReceive, STATECONNECTED");
                 safeUnregisterReceiver(context, this);
                 fireOnBluetoothConnected();
+                break;
+            case BluetoothAdapter.ERROR:
+                safeUnregisterReceiver(context, this);
+                fireOnBluetoothError();
                 break;
         }
     }
@@ -87,7 +92,14 @@ public class BluetoothBroadcastReceiver extends BroadcastReceiver {
         }
     }
 
+    private void fireOnBluetoothError () {
+        if (mCallback != null) {
+            mCallback.onBluetoothError();
+        }
+    }
+
     public static interface Callback {
         public void onBluetoothConnected();
+        public void onBluetoothError();
     }
 }

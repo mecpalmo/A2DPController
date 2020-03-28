@@ -19,7 +19,9 @@ public class BluetoothA2DPRequester implements BluetoothProfile.ServiceListener 
 
     @Override
     public void onServiceConnected(int i, BluetoothProfile bluetoothProfile) {
-        CodecController.setA2dp((BluetoothA2dp)bluetoothProfile);
+        if (mCallback != null) {
+            mCallback.onA2DPProxyReceived((BluetoothA2dp)bluetoothProfile);
+        }
     }
 
     @Override
@@ -29,5 +31,6 @@ public class BluetoothA2DPRequester implements BluetoothProfile.ServiceListener 
 
     public static interface Callback {
         public void onBluetoothDisconnected();
+        public void onA2DPProxyReceived(BluetoothA2dp proxy);
     }
 }
