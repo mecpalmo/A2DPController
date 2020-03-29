@@ -37,7 +37,7 @@ public class Codec {
             case SOURCE_CODEC_TYPE_LDAC:
                 return "LDAC";
             default:
-                return "ERROR";
+                return "";
         }
     }
 

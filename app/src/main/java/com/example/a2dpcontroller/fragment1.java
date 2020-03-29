@@ -34,9 +34,10 @@ public class fragment1 extends Fragment {
     public void setLocalCodecs(List<Integer> list) {
         String str = "";
         if (list.size() > 0) {
-
             for (int item : list) {
-                str = str + Codec.getCodecName(item) + ", ";
+                if(item>= Codec.SOURCE_CODEC_TYPE_SBC && item<=Codec.SOURCE_CODEC_TYPE_LDAC) {
+                    str = str + Codec.getCodecName(item) + ", ";
+                }
             }
             str = str.substring(0, str.length() - 2);
         } else{
@@ -49,9 +50,10 @@ public class fragment1 extends Fragment {
     public void setSelectableCodecs(List<Integer> list){
         String str = "";
         if (list.size() > 0) {
-
             for (int item : list) {
-                str = str + Codec.getCodecName(item) + ", ";
+                if(item>= Codec.SOURCE_CODEC_TYPE_SBC && item<=Codec.SOURCE_CODEC_TYPE_LDAC) {
+                    str = str + Codec.getCodecName(item) + ", ";
+                }
             }
             str = str.substring(0, str.length() - 2);
         } else{

@@ -1,29 +1,22 @@
 package com.example.a2dpcontroller;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothAdapter;
-import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity implements BluetoothBroadcastReceiver.Callback, BluetoothA2DPRequester.Callback {
 
     private static final String TAG = "MyApp";
     private BluetoothAdapter mAdapter;
     private CodecController codecController;
-    private BluetoothA2DPRequester a2DPRequester;
 
     private fragment1 fragment;
     private TextView textView1;
@@ -40,7 +33,6 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
         codecController = new CodecController();
         setViewComponents();
@@ -52,8 +44,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
     public void initiateBluetoothAdapter(){
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mAdapter.isEnabled()) {
-            a2DPRequester = new BluetoothA2DPRequester(this);
-            a2DPRequester.request(this, mAdapter);
+            new BluetoothA2DPRequester(this).request(this, mAdapter);
         }
     }
 
@@ -78,17 +69,30 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
 
     private void setDesiredCodec(){
         codecController.setCodec(MAX_SOURCE_CODEC_TYPE);
-        getCurrentCodec();
+        getAllInfo();
     }
 
-    private void getCurrentCodec(){
-        int codec = codecController.getCurrentCodec();
-        Log.i("MYAPP","Codec: "+codec);
+    private void setMAX_SOURCE_CODEC_TYPE(List<Integer> list){
+        if(list.contains(Codec.SOURCE_CODEC_TYPE_LDAC)){
+            MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_LDAC;
+        }else if(list.contains(Codec.SOURCE_CODEC_TYPE_APTX_HD)){
+            MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_APTX_HD;
+        }else if(list.contains(Codec.SOURCE_CODEC_TYPE_APTX)){
+            MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_APTX;
+        }else if(list.contains(Codec.SOURCE_CODEC_TYPE_AAC)){
+            MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_AAC;
+        }else{
+            MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_SBC;
+        }
+    }
 
-        textView1.setText(Codec.getCodecName(codec));
+    private void getAllInfo(){
+        codecController.getCurrentCodec();
 
-        progressBar.setProgress(ProgressBarInfo.LDAC_QUALITY);
-        textView4.setText("Quality: Very Good");
+        textView1.setText(Codec.getCodecName(codecController.getCodec()));
+
+        progressBar.setProgress(ProgressBarInfo.getProgress(codecController.getCodec()));
+        textView4.setText(ProgressBarInfo.getText(progressBar.getProgress()));
         progressBar.setProgressTintList(ColorStateList.valueOf(ProgressBarInfo.getColor(progressBar.getProgress())));
 
         switch (codecController.getSAMPLE_RATE()){
@@ -127,45 +131,26 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
                 textView3.setText("Bits Per Sample: None");
         }
 
-        if(codec == MAX_SOURCE_CODEC_TYPE){
-            textView1.setForegroundTintList(ColorStateList.valueOf(Color.GREEN));
-            button2.setEnabled(false);
-        }else{
-            textView1.setForegroundTintList(ColorStateList.valueOf(Color.BLACK));
-            button2.setEnabled(true);
-        }
-    }
-
-    private void getPossibleCodecs(){
         List<Integer> localCodecs = codecController.getLocalCodecs();
-        LinkedHashSet<Integer> hashSet = new LinkedHashSet<>(localCodecs);
-        List<Integer> LocalCodecs = new ArrayList<>(hashSet);
-        fragment.setLocalCodecs(LocalCodecs);
+        //LinkedHashSet<Integer> hashSet = new LinkedHashSet<>(localCodecs);
+        //List<Integer> LocalCodecs = new ArrayList<>(hashSet);
+        fragment.setLocalCodecs(localCodecs);
 
         List<Integer> selectableCodecs = codecController.getSelectableCodecs();
-        LinkedHashSet<Integer> hashSet2 = new LinkedHashSet<>(selectableCodecs);
-        List<Integer> SelectableCodecs = new ArrayList<>(hashSet2);
-        setMAX_SOURCE_CODEC_TYPE(SelectableCodecs);
-        fragment.setLocalCodecs(SelectableCodecs);
-    }
+        //LinkedHashSet<Integer> hashSet2 = new LinkedHashSet<>(selectableCodecs);
+        //List<Integer> SelectableCodecs = new ArrayList<>(hashSet2);
+        setMAX_SOURCE_CODEC_TYPE(selectableCodecs);
+        fragment.setSelectableCodecs(selectableCodecs);
 
-    private void setMAX_SOURCE_CODEC_TYPE(List<Integer> list){
-        if(list.contains(Codec.SOURCE_CODEC_TYPE_LDAC)){
-            MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_LDAC;
-        }else if(list.contains(Codec.SOURCE_CODEC_TYPE_APTX_HD)){
-            MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_APTX_HD;
-        }else if(list.contains(Codec.SOURCE_CODEC_TYPE_APTX)){
-            MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_APTX;
-        }else if(list.contains(Codec.SOURCE_CODEC_TYPE_AAC)){
-            MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_AAC;
+        if(codecController.getCodec() == MAX_SOURCE_CODEC_TYPE){
+            //textView1.setForegroundTintList(ColorStateList.valueOf(Color.GREEN));
+            button2.setEnabled(false);
+            button2.setText("Using Maximum Quality");
         }else{
-            MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_SBC;
+            //textView1.setForegroundTintList(ColorStateList.valueOf(Color.BLACK));
+            button2.setEnabled(true);
+            button2.setText("Increase Codec Quality");
         }
-    }
-
-    private void getAllInfo(){
-        getPossibleCodecs();
-        getCurrentCodec();
     }
 
     private void setDefaultText(){
@@ -175,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
         textView4.setText("Quality: None");
         fragment.setDefaultText();
         button2.setEnabled(false);
+        button2.setText("No device detected");
     }
 
 
