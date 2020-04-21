@@ -2,7 +2,9 @@ package com.example.a2dpcontroller;
 
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.os.Build;
+import android.widget.Toast;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -11,6 +13,7 @@ import java.util.List;
 
 public class CodecController {
 
+    Context main;
     private static BluetoothA2dp a2dp;
     private static Object bcodecconfig;
 
@@ -20,13 +23,16 @@ public class CodecController {
     ArrayList<Integer> localCodecs = new ArrayList<>();
     ArrayList<Integer> selectableCodecs = new ArrayList<>();
 
-    CodecController(){ }
+    CodecController(Context context){
+        main = context;
+    }
 
     public void setA2dp(BluetoothA2dp setter){
         a2dp = setter;
     }
 
-    public void getCurrentCodec(){
+    public boolean getCurrentCodec(){
+        boolean success = true;
         Object bcodecstatus;
         try{
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
@@ -37,6 +43,7 @@ public class CodecController {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
             bcodecstatus = null;
+            success = false;
         }
 
         if(bcodecstatus != null){
@@ -45,9 +52,11 @@ public class CodecController {
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
                 bcodecconfig = null;
+                success = false;
             }
         }else{
             bcodecconfig = null;
+            success = false;
         }
 
         if(bcodecconfig != null) {
@@ -58,9 +67,11 @@ public class CodecController {
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
                 codec = 10;
+                success = false;
             }
         }else {
             codec = 10;
+            success = false;
         }
 
         Object[] localconfig;
@@ -69,6 +80,7 @@ public class CodecController {
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
             localconfig= null;
+            success = false;
         }
         while(localCodecs.size()>0){
             localCodecs.remove(localCodecs.size()-1);
@@ -79,6 +91,7 @@ public class CodecController {
                 localCodecs.add((int)getCodecType().invoke(config));
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
+                success = false;
             }
         }
 
@@ -87,6 +100,7 @@ public class CodecController {
             selectableconfig = (Object[])getCodecsSelectableCapabilities().invoke(bcodecstatus);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
+            success = false;
         }
         while(selectableCodecs.size()>0){
             selectableCodecs.remove(selectableCodecs.size()-1);
@@ -97,15 +111,19 @@ public class CodecController {
                 selectableCodecs.add((int)getCodecType().invoke(config));
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
+                success = false;
             }
         }
+        return success;
     }
 
-    public void setCodec(int CODEC_TYPE){
+    public boolean setCodec(int CODEC_TYPE){
+        boolean success = true;
         try {
             setCodecPriority().invoke(bcodecconfig, CODEC_TYPE);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
+            success = false;
         }
         if(bcodecconfig != null) {
             Object params[] = {(Object)getBluetoothDevice(),(Object)bcodecconfig};
@@ -113,8 +131,12 @@ public class CodecController {
                 setCodecConfigPreference().invoke(a2dp, params);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
+                success = false;
             }
+        }else {
+            success = false;
         }
+        return success;
     }
 
     public int getSAMPLE_RATE(){
@@ -173,6 +195,28 @@ public class CodecController {
                 return null;
             }
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<String> getDevicesNames(){
+        List<String> list = new ArrayList<String>();
+        List<BluetoothDevice> devices = getBluetoothDevices();
+        if(devices != null) {
+            for (int i = 0; i < devices.size(); i++) {
+                list.add(devices.get(i).getName());
+            }
+        }
+        return list;
+    }
+
+    private List<BluetoothDevice> getBluetoothDevices(){
+        try {
+            Method getConnectedDevices = BluetoothA2dp.class.getDeclaredMethod("getConnectedDevices");
+            List<BluetoothDevice> list = (List<BluetoothDevice>)getConnectedDevices.invoke(a2dp);
+            return list;
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
             return null;
         }

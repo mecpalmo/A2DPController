@@ -36,7 +36,7 @@ public class ProgressBarInfo {
         if(value >= GREEN_BORDER){
             return "Quality: Very Good";
         }else if(value >= YELLOW_BORDER){
-            return "Quality: Good";
+            return "Quality: Fine";
         }else if(value >= RED_BORDER){
             return"Quality: Weak";
         }else{

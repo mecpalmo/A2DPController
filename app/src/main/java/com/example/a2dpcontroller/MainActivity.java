@@ -8,9 +8,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class MainActivity extends AppCompatActivity implements BluetoothBroadcastReceiver.Callback, BluetoothA2DPRequester.Callback {
 
@@ -23,9 +26,11 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
     private TextView textView2;
     private TextView textView3;
     private TextView textView4;
+    private TextView textView5;
     private ProgressBar progressBar;
     private Button button1;
     private Button button2;
+    private SwipeRefreshLayout mSwipeRefresh;
 
     private int MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_SBC;
 
@@ -34,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        codecController = new CodecController();
+        codecController = new CodecController(this);
         setViewComponents();
         setDefaultText();
 
@@ -45,6 +50,13 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mAdapter.isEnabled()) {
             new BluetoothA2DPRequester(this).request(this, mAdapter);
+        }else{
+            if(mAdapter.enable()) {
+                BluetoothBroadcastReceiver.register(this, this);
+            }else{
+                setDefaultText();
+                Toast.makeText(this, "Cannot Enable Bluetooth", Toast.LENGTH_SHORT);
+            }
         }
     }
 
@@ -54,103 +66,128 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
         textView2 = (TextView)findViewById(R.id.textView2);
         textView3 = (TextView)findViewById(R.id.textView3);
         textView4 = (TextView)findViewById(R.id.textView4);
+        textView5 = (TextView)findViewById(R.id.textView5);
         button1 = (Button)findViewById(R.id.button1);
         button2 = (Button)findViewById(R.id.button2);
         button2.setEnabled(false);
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setDesiredCodec();
+                setDesiredCodec(MAX_SOURCE_CODEC_TYPE);
             }
         });
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
         progressBar.setMax(ProgressBarInfo.MAX_VALUE_QUALITY);
+        mSwipeRefresh = findViewById(R.id.swiperefresh);
+        mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                initiateBluetoothAdapter();
+            }
+        });
     }
 
-    private void setDesiredCodec(){
-        codecController.setCodec(MAX_SOURCE_CODEC_TYPE);
-        getAllInfo();
+    private void setDesiredCodec(int codec_type){
+        boolean one = codecController.setCodec(codec_type);
+        boolean two = getAllInfo();
+        if(one && two){
+            Toast.makeText(this, "Codec changed success",Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this, "Failed to change codec",Toast.LENGTH_SHORT).show();
+        }
     }
 
-    private void setMAX_SOURCE_CODEC_TYPE(List<Integer> list){
-        if(list.contains(Codec.SOURCE_CODEC_TYPE_LDAC)){
+    private void setMAX_SOURCE_CODEC_TYPE(List<Integer> selectable, List<Integer> local){
+        if(selectable.contains(Codec.SOURCE_CODEC_TYPE_LDAC) && local.contains(Codec.SOURCE_CODEC_TYPE_LDAC)){
             MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_LDAC;
-        }else if(list.contains(Codec.SOURCE_CODEC_TYPE_APTX_HD)){
+        }else if(selectable.contains(Codec.SOURCE_CODEC_TYPE_APTX_HD) && local.contains(Codec.SOURCE_CODEC_TYPE_APTX_HD)){
             MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_APTX_HD;
-        }else if(list.contains(Codec.SOURCE_CODEC_TYPE_APTX)){
+        }else if(selectable.contains(Codec.SOURCE_CODEC_TYPE_APTX) && local.contains(Codec.SOURCE_CODEC_TYPE_APTX)){
             MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_APTX;
-        }else if(list.contains(Codec.SOURCE_CODEC_TYPE_AAC)){
+        }else if(selectable.contains(Codec.SOURCE_CODEC_TYPE_AAC) && local.contains(Codec.SOURCE_CODEC_TYPE_AAC)){
             MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_AAC;
         }else{
             MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_SBC;
         }
     }
 
-    private void getAllInfo(){
-        codecController.getCurrentCodec();
+    private boolean getAllInfo(){
+        boolean success = codecController.getCurrentCodec();
 
-        textView1.setText(Codec.getCodecName(codecController.getCodec()));
+        if(success) {
+            textView1.setText(Codec.getCodecName(codecController.getCodec()));
 
-        progressBar.setProgress(ProgressBarInfo.getProgress(codecController.getCodec()));
-        textView4.setText(ProgressBarInfo.getText(progressBar.getProgress()));
-        progressBar.setProgressTintList(ColorStateList.valueOf(ProgressBarInfo.getColor(progressBar.getProgress())));
 
-        switch (codecController.getSAMPLE_RATE()){
-            case Codec.SAMPLE_RATE_44100:
-                textView2.setText("Sample Rate: 44100 Hz");
-                break;
-            case Codec.SAMPLE_RATE_48000:
-                textView2.setText("Sample Rate: 48000 Hz");
-                break;
-            case Codec.SAMPLE_RATE_88200:
-                textView2.setText("Sample Rate: 88200 Hz");
-                break;
-            case Codec.SAMPLE_RATE_96000:
-                textView2.setText("Sample Rate: 96000 Hz");
-                break;
-            case Codec.SAMPLE_RATE_176400:
-                textView2.setText("Sample Rate: 176400 Hz");
-                break;
-            case Codec.SAMPLE_RATE_192000:
-                textView2.setText("Sample Rate: 192000 Hz");
-                break;
-            default:
-                textView2.setText("Sample Rate: None");
+            progressBar.setProgress(ProgressBarInfo.getProgress(codecController.getCodec()));
+            textView4.setText(ProgressBarInfo.getText(progressBar.getProgress()));
+            progressBar.setProgressTintList(ColorStateList.valueOf(ProgressBarInfo.getColor(progressBar.getProgress())));
+
+            switch (codecController.getSAMPLE_RATE()) {
+                case Codec.SAMPLE_RATE_44100:
+                    textView2.setText("Sample Rate: 44100 Hz");
+                    break;
+                case Codec.SAMPLE_RATE_48000:
+                    textView2.setText("Sample Rate: 48000 Hz");
+                    break;
+                case Codec.SAMPLE_RATE_88200:
+                    textView2.setText("Sample Rate: 88200 Hz");
+                    break;
+                case Codec.SAMPLE_RATE_96000:
+                    textView2.setText("Sample Rate: 96000 Hz");
+                    break;
+                case Codec.SAMPLE_RATE_176400:
+                    textView2.setText("Sample Rate: 176400 Hz");
+                    break;
+                case Codec.SAMPLE_RATE_192000:
+                    textView2.setText("Sample Rate: 192000 Hz");
+                    break;
+                default:
+                    textView2.setText("Sample Rate: None");
+            }
+            switch (codecController.getBITS_PER_SAMPLE()) {
+                case Codec.BITS_PER_SAMPLE_16:
+                    textView3.setText("Bits Per Sample: 16");
+                    break;
+                case Codec.BITS_PER_SAMPLE_24:
+                    textView3.setText("Bits Per Sample: 24");
+                    break;
+                case Codec.BITS_PER_SAMPLE_32:
+                    textView3.setText("Bits Per Sample: 32");
+                    break;
+                default:
+                    textView3.setText("Bits Per Sample: None");
+            }
+
+            List<Integer> localCodecs = codecController.getLocalCodecs();
+            fragment.setLocalCodecs(localCodecs);
+
+            List<Integer> selectableCodecs = codecController.getSelectableCodecs();
+            setMAX_SOURCE_CODEC_TYPE(selectableCodecs,localCodecs);
+            fragment.setSelectableCodecs(selectableCodecs);
+
+            if (codecController.getCodec() == MAX_SOURCE_CODEC_TYPE) {
+                //textView1.setForegroundTintList(ColorStateList.valueOf(Color.GREEN));
+                button2.setEnabled(false);
+                button2.setText("Using Maximum Quality");
+            } else {
+                //textView1.setForegroundTintList(ColorStateList.valueOf(Color.BLACK));
+                button2.setEnabled(true);
+                button2.setText("Increase Codec Quality");
+            }
+
+            List<String> devicesName = codecController.getDevicesNames();
+            if(devicesName.size()>1){
+                setDefaultText();
+                textView5.setText("More then 1 device connected");
+                button2.setText("Unable to use A2DP");
+            }else{
+                textView5.setText("Bluetooth Device: "+devicesName.get(0));
+            }
+
+        }else {
+            setDefaultText();
         }
-        switch (codecController.getBITS_PER_SAMPLE()){
-            case Codec.BITS_PER_SAMPLE_16:
-                textView3.setText("Bits Per Sample: 16");
-                break;
-            case Codec.BITS_PER_SAMPLE_24:
-                textView3.setText("Bits Per Sample: 24");
-                break;
-            case Codec.BITS_PER_SAMPLE_32:
-                textView3.setText("Bits Per Sample: 32");
-                break;
-            default:
-                textView3.setText("Bits Per Sample: None");
-        }
-
-        List<Integer> localCodecs = codecController.getLocalCodecs();
-        //LinkedHashSet<Integer> hashSet = new LinkedHashSet<>(localCodecs);
-        //List<Integer> LocalCodecs = new ArrayList<>(hashSet);
-        fragment.setLocalCodecs(localCodecs);
-
-        List<Integer> selectableCodecs = codecController.getSelectableCodecs();
-        //LinkedHashSet<Integer> hashSet2 = new LinkedHashSet<>(selectableCodecs);
-        //List<Integer> SelectableCodecs = new ArrayList<>(hashSet2);
-        setMAX_SOURCE_CODEC_TYPE(selectableCodecs);
-        fragment.setSelectableCodecs(selectableCodecs);
-
-        if(codecController.getCodec() == MAX_SOURCE_CODEC_TYPE){
-            //textView1.setForegroundTintList(ColorStateList.valueOf(Color.GREEN));
-            button2.setEnabled(false);
-            button2.setText("Using Maximum Quality");
-        }else{
-            //textView1.setForegroundTintList(ColorStateList.valueOf(Color.BLACK));
-            button2.setEnabled(true);
-            button2.setText("Increase Codec Quality");
-        }
+        return success;
     }
 
     private void setDefaultText(){
@@ -158,9 +195,11 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
         textView2.setText("Sample Rate: None");
         textView3.setText("Bits Per Sample: None");
         textView4.setText("Quality: None");
+        progressBar.setProgress(0);
         fragment.setDefaultText();
         button2.setEnabled(false);
         button2.setText("No device detected");
+        textView5.setText("Bluetooth Device: None");
     }
 
 
@@ -172,11 +211,14 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
     @Override
     public void onBluetoothError() {
         setDefaultText();
+        Toast.makeText(this,"Error has occured",Toast.LENGTH_SHORT);
     }
 
     @Override
     public void onBluetoothDisconnected() {
         setDefaultText();
+        Toast.makeText(this, "Device disconnected", Toast.LENGTH_SHORT);
+        BluetoothBroadcastReceiver.register(this,this);
     }
 
     @Override
