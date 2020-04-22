@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-public class fragment1 extends Fragment {
+public class fragment1 extends Fragment implements View.OnClickListener {
 
     private TextView textView1;
     private TextView textView2;
@@ -65,5 +65,10 @@ public class fragment1 extends Fragment {
     public void setDefaultText(){
         textView2.setText("None");
         textView4.setText("None");
+    }
+
+    @Override
+    public void onClick(View view) {
+
     }
 }

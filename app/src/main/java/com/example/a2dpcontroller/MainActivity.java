@@ -2,6 +2,7 @@ package com.example.a2dpcontroller;
 
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothAdapter;
+import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.View;
@@ -10,8 +11,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -20,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
     private static final String TAG = "MyApp";
     private BluetoothAdapter mAdapter;
     private CodecController codecController;
+    private boolean NONE = true;
 
     private fragment1 fragment;
     private TextView textView1;
@@ -30,9 +34,12 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
     private ProgressBar progressBar;
     private Button button1;
     private Button button2;
+    private Button button3;
     private SwipeRefreshLayout mSwipeRefresh;
 
     private int MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_SBC;
+    private int CURRENT_CODEC_TYPE = -1;
+    private String[] listOfSelectableCodecs = {Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_SBC)};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +83,13 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
                 setDesiredCodec(MAX_SOURCE_CODEC_TYPE);
             }
         });
+        button3 = (Button)findViewById(R.id.button3);
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchCustomCodecList();
+            }
+        });
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
         progressBar.setMax(ProgressBarInfo.MAX_VALUE_QUALITY);
         mSwipeRefresh = findViewById(R.id.swiperefresh);
@@ -85,6 +99,42 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
                 initiateBluetoothAdapter();
             }
         });
+    }
+
+    private void launchCustomCodecList(){
+        if(!NONE && listOfSelectableCodecs.length > 1 && CURRENT_CODEC_TYPE >= 0){
+            AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
+            mBuilder.setTitle("Choose specific codec");
+            mBuilder.setSingleChoiceItems(listOfSelectableCodecs, -1, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    if(listOfSelectableCodecs[i]==Codec.getCodecName(CURRENT_CODEC_TYPE)){
+
+                    }else if(listOfSelectableCodecs[i]==Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_SBC)){
+                        setDesiredCodec(Codec.SOURCE_CODEC_TYPE_SBC);
+                    }else if(listOfSelectableCodecs[i]==Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_AAC)){
+                        setDesiredCodec(Codec.SOURCE_CODEC_TYPE_AAC);
+                    }else if(listOfSelectableCodecs[i]==Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_APTX)){
+                        setDesiredCodec(Codec.SOURCE_CODEC_TYPE_APTX);
+                    }else if(listOfSelectableCodecs[i]==Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_APTX_HD)){
+                        setDesiredCodec(Codec.SOURCE_CODEC_TYPE_APTX_HD);
+                    }else if(listOfSelectableCodecs[i]==Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_LDAC)){
+                        setDesiredCodec(Codec.SOURCE_CODEC_TYPE_LDAC);
+                    }else{
+                        makeDefualtToast();
+                    }
+                    dialogInterface.dismiss();
+                }
+            });
+            mBuilder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                }
+            });
+            AlertDialog mDialog = mBuilder.create();
+            mDialog.show();
+        }
     }
 
     private void setDesiredCodec(int codec_type){
@@ -111,13 +161,33 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
         }
     }
 
+    private void setListOfSelectableCodecs(List<Integer> selectable, List<Integer> local){
+        List<String> stringList = new ArrayList<String>();
+        if(selectable.contains(Codec.SOURCE_CODEC_TYPE_LDAC) && local.contains(Codec.SOURCE_CODEC_TYPE_LDAC)) {
+            stringList.add(Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_LDAC));
+        }
+        if(selectable.contains(Codec.SOURCE_CODEC_TYPE_APTX_HD) && local.contains(Codec.SOURCE_CODEC_TYPE_APTX_HD)){
+            stringList.add(Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_APTX_HD));
+        }
+        if(selectable.contains(Codec.SOURCE_CODEC_TYPE_APTX) && local.contains(Codec.SOURCE_CODEC_TYPE_APTX)){
+            stringList.add(Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_APTX));
+        }
+        if(selectable.contains(Codec.SOURCE_CODEC_TYPE_AAC) && local.contains(Codec.SOURCE_CODEC_TYPE_AAC)){
+            stringList.add(Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_AAC));
+        }
+        if(selectable.contains(Codec.SOURCE_CODEC_TYPE_SBC) && local.contains(Codec.SOURCE_CODEC_TYPE_SBC)){
+            stringList.add(Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_SBC));
+        }
+        listOfSelectableCodecs = (String[]) stringList.toArray();
+    }
+
     private boolean getAllInfo(){
         boolean success = codecController.getCurrentCodec();
 
         if(success) {
+            NONE = false;
             textView1.setText(Codec.getCodecName(codecController.getCodec()));
-
-
+            CURRENT_CODEC_TYPE = codecController.getCodec();
             progressBar.setProgress(ProgressBarInfo.getProgress(codecController.getCodec()));
             textView4.setText(ProgressBarInfo.getText(progressBar.getProgress()));
             progressBar.setProgressTintList(ColorStateList.valueOf(ProgressBarInfo.getColor(progressBar.getProgress())));
@@ -163,6 +233,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
 
             List<Integer> selectableCodecs = codecController.getSelectableCodecs();
             setMAX_SOURCE_CODEC_TYPE(selectableCodecs,localCodecs);
+            setListOfSelectableCodecs(selectableCodecs,localCodecs);
             fragment.setSelectableCodecs(selectableCodecs);
 
             if (codecController.getCodec() == MAX_SOURCE_CODEC_TYPE) {
@@ -191,6 +262,8 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
     }
 
     private void setDefaultText(){
+        NONE = true;
+        CURRENT_CODEC_TYPE = -1;
         textView1.setText("None");
         textView2.setText("Sample Rate: None");
         textView3.setText("Bits Per Sample: None");
@@ -202,6 +275,9 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
         textView5.setText("Bluetooth Device: None");
     }
 
+    private void makeDefualtToast(){
+        Toast.makeText(this,"Something went wrong",Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     public void onBluetoothConnected() {

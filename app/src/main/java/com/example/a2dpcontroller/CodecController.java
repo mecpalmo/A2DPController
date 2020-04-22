@@ -17,7 +17,7 @@ public class CodecController {
     private static BluetoothA2dp a2dp;
     private static Object bcodecconfig;
 
-    private int codec = 10;
+    private int codec = -1;
     private int SAMPLE_RATE = 0;
     private int BITS_PER_SAMPLE = 0;
     ArrayList<Integer> localCodecs = new ArrayList<>();
@@ -66,11 +66,11 @@ public class CodecController {
                 BITS_PER_SAMPLE = (int)getBitsPerSample().invoke(bcodecconfig);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
-                codec = 10;
+                codec = -1;
                 success = false;
             }
         }else {
-            codec = 10;
+            codec = -1;
             success = false;
         }
 
