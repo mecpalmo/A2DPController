@@ -2,7 +2,6 @@ package com.example.a2dpcontroller;
 
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
 import android.os.Build;
 
 import java.lang.reflect.InvocationTargetException;
