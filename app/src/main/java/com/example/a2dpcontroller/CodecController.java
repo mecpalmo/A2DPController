@@ -111,7 +111,7 @@ public class CodecController {
                 success = false;
             }
         }
-        //getBluetoothDevices();
+        getBluetoothDevices();
         return success;
     }
 

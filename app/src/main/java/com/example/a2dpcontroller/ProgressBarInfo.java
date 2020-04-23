@@ -19,11 +19,11 @@ public class ProgressBarInfo {
         switch (codecType){
             case Codec.SOURCE_CODEC_TYPE_LDAC:
                 return LDAC_QUALITY;
-            case Codec.SOURCE_CODEC_TYPE_AAC:
+            case Codec.SOURCE_CODEC_TYPE_APTX_HD:
                 return APTXHD_QUALITY;
             case Codec.SOURCE_CODEC_TYPE_APTX:
                 return APTX_QUALITY;
-            case Codec.SOURCE_CODEC_TYPE_APTX_HD:
+            case Codec.SOURCE_CODEC_TYPE_AAC:
                 return AAC_QUALITY;
             case Codec.SOURCE_CODEC_TYPE_SBC:
                 return SBC_QUALITY;

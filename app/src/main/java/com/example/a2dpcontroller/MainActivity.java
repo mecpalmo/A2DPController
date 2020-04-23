@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -18,7 +19,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class MainActivity extends AppCompatActivity implements BluetoothBroadcastReceiver.Callback, BluetoothA2DPRequester.Callback {
 
@@ -37,12 +37,11 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
     private Button button1;
     private Button button2;
     private Button button3;
-    private SwipeRefreshLayout mSwipeRefresh;
-    private ActionBarDrawerToggle mToggle;
+    //private ActionBarDrawerToggle mToggle;
 
     private int MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_SBC;
     private int CURRENT_CODEC_TYPE = -1;
-    private String[] listOfSelectableCodecs = {Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_SBC)};
+    private List<Integer> listOfSelectableCodecs = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,14 +52,17 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
         setViewComponents();
         setDefaultText();
 
+
         initiateBluetoothAdapter();
     }
 
     public void initiateBluetoothAdapter(){
         mAdapter = BluetoothAdapter.getDefaultAdapter();
+        Log.i("MYAPP", "got the adapter");
         if (mAdapter.isEnabled()) {
             new BluetoothA2DPRequester(this).request(this, mAdapter);
-        }else{
+            Log.i("MYAPP", "Requester Requested");
+        }else {
             if(mAdapter.enable()) {
                 BluetoothBroadcastReceiver.register(this, this);
             }else{
@@ -95,38 +97,22 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
         });
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
         progressBar.setMax(ProgressBarInfo.MAX_VALUE_QUALITY);
-        /*mSwipeRefresh = findViewById(R.id.swiperefresh);
-        mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                initiateBluetoothAdapter();
-            }
-        });*/
 
     }
 
     private void launchCustomCodecList(){
-        if(!NONE && listOfSelectableCodecs.length > 1 && CURRENT_CODEC_TYPE >= 0){
+        if(!NONE && listOfSelectableCodecs.size() > 1 && CURRENT_CODEC_TYPE >= Codec.SOURCE_CODEC_TYPE_SBC && CURRENT_CODEC_TYPE <= Codec.SOURCE_CODEC_TYPE_LDAC ){
             AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
+            List<String> stringList = new ArrayList<>();
+            for(int item : listOfSelectableCodecs){
+                stringList.add(Codec.getCodecName(item));
+            }
+            String[] stringArray = stringList.toArray(new String[0]);
             mBuilder.setTitle("Choose specific codec");
-            mBuilder.setSingleChoiceItems(listOfSelectableCodecs, -1, new DialogInterface.OnClickListener() {
+            mBuilder.setSingleChoiceItems(stringArray, -1, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    if(listOfSelectableCodecs[i]==Codec.getCodecName(CURRENT_CODEC_TYPE)){
-
-                    }else if(listOfSelectableCodecs[i]==Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_SBC)){
-                        setDesiredCodec(Codec.SOURCE_CODEC_TYPE_SBC);
-                    }else if(listOfSelectableCodecs[i]==Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_AAC)){
-                        setDesiredCodec(Codec.SOURCE_CODEC_TYPE_AAC);
-                    }else if(listOfSelectableCodecs[i]==Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_APTX)){
-                        setDesiredCodec(Codec.SOURCE_CODEC_TYPE_APTX);
-                    }else if(listOfSelectableCodecs[i]==Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_APTX_HD)){
-                        setDesiredCodec(Codec.SOURCE_CODEC_TYPE_APTX_HD);
-                    }else if(listOfSelectableCodecs[i]==Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_LDAC)){
-                        setDesiredCodec(Codec.SOURCE_CODEC_TYPE_LDAC);
-                    }else{
-                        makeDefualtToast();
-                    }
+                    setDesiredCodec(listOfSelectableCodecs.get(i));
                     dialogInterface.dismiss();
                 }
             });
@@ -145,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
         boolean one = codecController.setCodec(codec_type);
         boolean two = getAllInfo();
         if(one && two){
-            Toast.makeText(this, "Codec changed success",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Codec changed successfully",Toast.LENGTH_SHORT).show();
         }else{
             Toast.makeText(this, "Failed to change codec",Toast.LENGTH_SHORT).show();
         }
@@ -166,23 +152,22 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
     }
 
     private void setListOfSelectableCodecs(List<Integer> selectable, List<Integer> local){
-        List<String> stringList = new ArrayList<String>();
-        if(selectable.contains(Codec.SOURCE_CODEC_TYPE_LDAC) && local.contains(Codec.SOURCE_CODEC_TYPE_LDAC)) {
-            stringList.add(Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_LDAC));
-        }
-        if(selectable.contains(Codec.SOURCE_CODEC_TYPE_APTX_HD) && local.contains(Codec.SOURCE_CODEC_TYPE_APTX_HD)){
-            stringList.add(Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_APTX_HD));
-        }
-        if(selectable.contains(Codec.SOURCE_CODEC_TYPE_APTX) && local.contains(Codec.SOURCE_CODEC_TYPE_APTX)){
-            stringList.add(Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_APTX));
+        listOfSelectableCodecs = new ArrayList<>();
+        if(selectable.contains(Codec.SOURCE_CODEC_TYPE_SBC) && local.contains(Codec.SOURCE_CODEC_TYPE_SBC)) {
+            listOfSelectableCodecs.add(Codec.SOURCE_CODEC_TYPE_SBC);
         }
         if(selectable.contains(Codec.SOURCE_CODEC_TYPE_AAC) && local.contains(Codec.SOURCE_CODEC_TYPE_AAC)){
-            stringList.add(Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_AAC));
+            listOfSelectableCodecs.add(Codec.SOURCE_CODEC_TYPE_AAC);
         }
-        if(selectable.contains(Codec.SOURCE_CODEC_TYPE_SBC) && local.contains(Codec.SOURCE_CODEC_TYPE_SBC)){
-            stringList.add(Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_SBC));
+        if(selectable.contains(Codec.SOURCE_CODEC_TYPE_APTX) && local.contains(Codec.SOURCE_CODEC_TYPE_APTX)){
+            listOfSelectableCodecs.add(Codec.SOURCE_CODEC_TYPE_APTX);
         }
-        listOfSelectableCodecs = (String[]) stringList.toArray();
+        if(selectable.contains(Codec.SOURCE_CODEC_TYPE_APTX_HD) && local.contains(Codec.SOURCE_CODEC_TYPE_APTX_HD)){
+            listOfSelectableCodecs.add(Codec.SOURCE_CODEC_TYPE_APTX_HD);
+        }
+        if(selectable.contains(Codec.SOURCE_CODEC_TYPE_LDAC) && local.contains(Codec.SOURCE_CODEC_TYPE_LDAC)){
+            listOfSelectableCodecs.add(Codec.SOURCE_CODEC_TYPE_LDAC);
+        }
     }
 
     private boolean getAllInfo(){
@@ -218,6 +203,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
                 default:
                     textView2.setText("Sample Rate: None");
             }
+
             switch (codecController.getBITS_PER_SAMPLE()) {
                 case Codec.BITS_PER_SAMPLE_16:
                     textView3.setText("Bits Per Sample: 16");
@@ -309,4 +295,8 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
         getAllInfo();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }
