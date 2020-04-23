@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/MainPage" android:title="Main Page" android:icon="@drawable/ic_settings_black_24dp"/>
+    <item android:id="@+id/SBC" android:title="SBC" android:icon="@drawable/ic_info_black_24dp"/>
+    <item android:id="@+id/AAC" android:title="AAC" android:icon="@drawable/ic_info_black_24dp"/>
+    <item android:id="@+id/aptX" android:title="aptX" android:icon="@drawable/ic_info_black_24dp"/>
+    <item android:id="@+id/aptX_HD" android:title="aptX HD" android:icon="@drawable/ic_info_black_24dp"/>
+    <item android:id="@+id/LDAC" android:title="LDAC" android:icon="@drawable/ic_info_black_24dp"/>
+    <item android:id="@+id/about" android:title="About App" android:icon="@drawable/ic_stay_current_portrait_black_24dp"/>
+</menu>

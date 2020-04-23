@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.os.Build;
-import android.widget.Toast;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -13,7 +12,6 @@ import java.util.List;
 
 public class CodecController {
 
-    Context main;
     private static BluetoothA2dp a2dp;
     private static Object bcodecconfig;
 
@@ -22,9 +20,9 @@ public class CodecController {
     private int BITS_PER_SAMPLE = 0;
     ArrayList<Integer> localCodecs = new ArrayList<>();
     ArrayList<Integer> selectableCodecs = new ArrayList<>();
+    ArrayList<String> devicesNames = new ArrayList<>();
 
-    CodecController(Context context){
-        main = context;
+    CodecController(){
     }
 
     public void setA2dp(BluetoothA2dp setter){
@@ -114,6 +112,7 @@ public class CodecController {
                 success = false;
             }
         }
+        //getBluetoothDevices();
         return success;
     }
 
@@ -201,24 +200,20 @@ public class CodecController {
     }
 
     public List<String> getDevicesNames(){
-        List<String> list = new ArrayList<String>();
-        List<BluetoothDevice> devices = getBluetoothDevices();
-        if(devices != null) {
-            for (int i = 0; i < devices.size(); i++) {
-                list.add(devices.get(i).getName());
-            }
-        }
-        return list;
+        return devicesNames;
     }
 
-    private List<BluetoothDevice> getBluetoothDevices(){
+    private void getBluetoothDevices(){
         try {
             Method getConnectedDevices = BluetoothA2dp.class.getDeclaredMethod("getConnectedDevices");
             List<BluetoothDevice> list = (List<BluetoothDevice>)getConnectedDevices.invoke(a2dp);
-            return list;
+            devicesNames = new ArrayList<>();
+            for (int i = 0; i < list.size(); i++) {
+                devicesNames.add(list.get(i).getName());
+            }
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
-            return null;
+            devicesNames = new ArrayList<>();
         }
     }
 

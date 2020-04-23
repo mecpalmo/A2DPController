@@ -14,8 +14,10 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class MainActivity extends AppCompatActivity implements BluetoothBroadcastReceiver.Callback, BluetoothA2DPRequester.Callback {
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
     private Button button2;
     private Button button3;
     private SwipeRefreshLayout mSwipeRefresh;
+    private ActionBarDrawerToggle mToggle;
 
     private int MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_SBC;
     private int CURRENT_CODEC_TYPE = -1;
@@ -46,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        codecController = new CodecController(this);
+        codecController = new CodecController();
         setViewComponents();
         setDefaultText();
 
@@ -62,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
                 BluetoothBroadcastReceiver.register(this, this);
             }else{
                 setDefaultText();
-                Toast.makeText(this, "Cannot Enable Bluetooth", Toast.LENGTH_SHORT);
+                Toast.makeText(this, "Cannot Enable Bluetooth", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -92,13 +95,14 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
         });
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
         progressBar.setMax(ProgressBarInfo.MAX_VALUE_QUALITY);
-        mSwipeRefresh = findViewById(R.id.swiperefresh);
+        /*mSwipeRefresh = findViewById(R.id.swiperefresh);
         mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 initiateBluetoothAdapter();
             }
-        });
+        });*/
+
     }
 
     private void launchCustomCodecList(){
@@ -251,8 +255,10 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
                 setDefaultText();
                 textView5.setText("More then 1 device connected");
                 button2.setText("Unable to use A2DP");
-            }else{
+            }else if(devicesName.size()==1){
                 textView5.setText("Bluetooth Device: "+devicesName.get(0));
+            }else{
+                textView5.setText("Bluetooth Device: Unknown");
             }
 
         }else {
@@ -287,13 +293,13 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
     @Override
     public void onBluetoothError() {
         setDefaultText();
-        Toast.makeText(this,"Error has occured",Toast.LENGTH_SHORT);
+        Toast.makeText(this,"Error has occured",Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onBluetoothDisconnected() {
         setDefaultText();
-        Toast.makeText(this, "Device disconnected", Toast.LENGTH_SHORT);
+        Toast.makeText(this, "Device disconnected", Toast.LENGTH_SHORT).show();
         BluetoothBroadcastReceiver.register(this,this);
     }
 

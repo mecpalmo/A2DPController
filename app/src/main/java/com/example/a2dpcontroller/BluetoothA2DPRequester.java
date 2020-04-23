@@ -13,7 +13,7 @@ public class BluetoothA2DPRequester implements BluetoothProfile.ServiceListener 
         mCallback = callback;
     }
 
-    public void request (Context c, BluetoothAdapter adapter) {
+    public void request(Context c, BluetoothAdapter adapter) {
         adapter.getProfileProxy(c, this, BluetoothProfile.A2DP);
     }
 
