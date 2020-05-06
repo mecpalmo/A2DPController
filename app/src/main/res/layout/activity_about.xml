@@ -18,8 +18,9 @@
         app:menu="@menu/drawermenu" />
 
     <include
-        layout="@layout/main_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        layout="@layout/content_about"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"/>
+
 
 </androidx.drawerlayout.widget.DrawerLayout>

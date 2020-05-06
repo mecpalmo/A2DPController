@@ -3,24 +3,31 @@ package com.example.a2dpcontroller;
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+//import com.google.android.material.navigation.NavigationView;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-public class MainActivity extends AppCompatActivity implements BluetoothBroadcastReceiver.Callback, BluetoothA2DPRequester.Callback {
+
+public class MainActivity extends AppCompatActivity implements BluetoothBroadcastReceiver.Callback, BluetoothA2DPRequester.Callback, NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "MyApp";
     private BluetoothAdapter mAdapter;
@@ -37,11 +44,13 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
     private Button button1;
     private Button button2;
     private Button button3;
-    //private ActionBarDrawerToggle mToggle;
 
     private int MAX_SOURCE_CODEC_TYPE = Codec.SOURCE_CODEC_TYPE_SBC;
     private int CURRENT_CODEC_TYPE = -1;
     private List<Integer> listOfSelectableCodecs = new ArrayList<>();
+
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
 
         codecController = new CodecController();
         setViewComponents();
+        setMenu();
         setDefaultText();
 
 
@@ -98,6 +108,16 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
         progressBar.setMax(ProgressBarInfo.MAX_VALUE_QUALITY);
 
+    }
+
+    private void setMenu(){
+        mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+        mToggle = new ActionBarDrawerToggle(this, mDrawerLayout,R.string.open,R.string.close);
+        mDrawerLayout.addDrawerListener(mToggle);
+        mToggle.syncState();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
     private void launchCustomCodecList(){
@@ -295,8 +315,54 @@ public class MainActivity extends AppCompatActivity implements BluetoothBroadcas
         getAllInfo();
     }
 
+    /*@Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        if(mToggle.onOptionsItemSelected(item)){
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }*/
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        switch (menuItem.getItemId()){
+            case R.id.MainPage:
+                Intent a = new Intent(MainActivity.this,MainActivity.class);
+                startActivity(a);
+                break;
+            case R.id.SBC:
+                Intent b = new Intent(MainActivity.this,sbcInfo.class);
+                startActivity(b);
+                break;
+            case R.id.AAC:
+                Intent c = new Intent(MainActivity.this,aacInfo.class);
+                startActivity(c);
+                break;
+            case R.id.aptX:
+                Intent d = new Intent(MainActivity.this,aptxInfo.class);
+                startActivity(d);
+                break;
+            case R.id.aptX_HD:
+                Intent e = new Intent(MainActivity.this,aptxhdInfo.class);
+                startActivity(e);
+                break;
+            case R.id.LDAC:
+                Intent f = new Intent(MainActivity.this,ldacInfo.class);
+                startActivity(f);
+                break;
+            case R.id.about:
+                Intent g = new Intent(MainActivity.this,about.class);
+                startActivity(g);
+                break;
+        }
+
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+
+        return true;
     }
 }

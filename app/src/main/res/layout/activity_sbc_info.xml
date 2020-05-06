@@ -18,7 +18,7 @@
         app:menu="@menu/drawermenu" />
 
     <include
-        layout="@layout/main_layout"
+        layout="@layout/content_sbc_info"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
