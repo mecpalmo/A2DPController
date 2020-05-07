@@ -2,7 +2,6 @@ package com.example.a2dpcontroller;
 
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -60,15 +59,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.MainPage:
-                Toast.makeText(this,"Main Page",Toast.LENGTH_SHORT).show();
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
                         new MainFragment(this)).commit();
                 mDrawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.SBC:
-                Toast.makeText(this,"Main Page",Toast.LENGTH_SHORT).show();
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
                         new SbcInfoFragment()).commit();
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.AAC:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
+                        new AacInfoFragment()).commit();
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.aptX:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
+                        new aptXInfoFragment()).commit();
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.aptX_HD:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
+                        new aptXHDInfoFragment()).commit();
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.LDAC:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
+                        new LdacInfoFragment()).commit();
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.about:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
+                        new AboutAppFragment()).commit();
                 mDrawerLayout.closeDrawer(GravityCompat.START);
                 break;
         }
