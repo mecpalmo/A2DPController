@@ -48,6 +48,7 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
     private int CURRENT_CODEC_TYPE = -1;
     private List<Integer> listOfSelectableCodecs = new ArrayList<>();
     private Context mainContext;
+    Toast currentToast;
 
     public MainFragment(Context context) {
         mainContext = context;
@@ -76,12 +77,12 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
             new BluetoothA2DPRequester(this).request(mainContext, mAdapter);
             Log.i("MYAPP", "Requester Requested");
         }else {
-            if(mAdapter.enable()) {
+            /*if(mAdapter.enable()) {
                 BluetoothBroadcastReceiver.register(this, mainContext);
             }else{
                 setDefaultText();
-                //Toast.makeText(this, "Cannot Enable Bluetooth", Toast.LENGTH_SHORT).show();
-            }
+                makeToast("Cannot Enable Bluetooth");
+            }*/
         }
     }
 
@@ -148,9 +149,9 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
         boolean one = codecController.setCodec(codec_type);
         boolean two = getAllInfo();
         if(one && two){
-            Toast.makeText(mainContext, "Codec changed successfully",Toast.LENGTH_SHORT).show();
+            makeToast("Codec changed successfully");
         }else{
-            Toast.makeText(mainContext, "Failed to change codec",Toast.LENGTH_SHORT).show();
+            makeToast("Failed to change codec");
         }
     }
 
@@ -317,7 +318,13 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
     }
 
     private void makeDefualtToast(){
-        Toast.makeText(mainContext,"Something went wrong",Toast.LENGTH_SHORT).show();
+        makeToast("Something went wrong");
+    }
+
+    private void makeToast(String str){
+        currentToast.cancel();
+        currentToast.makeText(mainContext, str, Toast.LENGTH_SHORT);
+        currentToast.show();
     }
 
     @Override
@@ -328,14 +335,14 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
     @Override
     public void onBluetoothError() {
         setDefaultText();
-        Toast.makeText(mainContext,"Error has occured",Toast.LENGTH_SHORT).show();
+        makeToast("Error has occured");
     }
 
     @Override
     public void onBluetoothDisconnected() {
         setDefaultText();
-        Toast.makeText(mainContext, "Device disconnected", Toast.LENGTH_SHORT).show();
-        BluetoothBroadcastReceiver.register(this,mainContext);
+        makeToast("Device disconnected");
+        BluetoothBroadcastReceiver.register(this, mainContext);
     }
 
     @Override

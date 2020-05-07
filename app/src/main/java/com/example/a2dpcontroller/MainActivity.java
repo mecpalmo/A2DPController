@@ -2,6 +2,7 @@ package com.example.a2dpcontroller;
 
 import android.os.Bundle;
 import android.view.MenuItem;
+import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -26,12 +27,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setMenu(){
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        mToggle = new ActionBarDrawerToggle(this, mDrawerLayout,R.string.open,R.string.close);
+        mToggle = new ActionBarDrawerToggle(this, mDrawerLayout,toolbar,R.string.open,R.string.close);
         mDrawerLayout.addDrawerListener(mToggle);
         mToggle.syncState();
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
