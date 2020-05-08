@@ -3,7 +3,9 @@ package com.example.a2dpcontroller;
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothDevice;
 import android.os.Build;
+import android.util.Log;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -12,11 +14,15 @@ import java.util.List;
 public class CodecController {
 
     private static BluetoothA2dp a2dp;
-    private static Object bcodecconfig;
 
     private int codec = -1;
     private int SAMPLE_RATE = 0;
     private int BITS_PER_SAMPLE = 0;
+    private int channelMode = 0;
+    private long codecSpecific1 = 0;
+    private long codecSpecific2 = 0;
+    private long codecSpecific3 = 0;
+    private long codecSpecific4 = 0;
     ArrayList<Integer> localCodecs = new ArrayList<>();
     ArrayList<Integer> selectableCodecs = new ArrayList<>();
     ArrayList<String> devicesNames = new ArrayList<>();
@@ -43,6 +49,7 @@ public class CodecController {
             success = false;
         }
 
+        Object bcodecconfig;
         if(bcodecstatus != null){
             try {
                 bcodecconfig = getCodecConfig().invoke(bcodecstatus);
@@ -61,6 +68,11 @@ public class CodecController {
                 codec = (int) getCodecType().invoke(bcodecconfig);
                 SAMPLE_RATE = (int)getSampleRate().invoke(bcodecconfig);
                 BITS_PER_SAMPLE = (int)getBitsPerSample().invoke(bcodecconfig);
+                channelMode = (int)getChannelMode().invoke(bcodecconfig);
+                codecSpecific1 = (long)getCodecSpecific1().invoke(bcodecconfig);
+                codecSpecific2 = (long)getCodecSpecific2().invoke(bcodecconfig);
+                codecSpecific3 = (long)getCodecSpecific3().invoke(bcodecconfig);
+                codecSpecific4 = (long)getCodecSpecific4().invoke(bcodecconfig);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
                 codec = -1;
@@ -117,19 +129,37 @@ public class CodecController {
 
     public boolean setCodec(int CODEC_TYPE){
         boolean success = true;
+        Object bcodecconfig2 = null;
         try {
-            setCodecPriority().invoke(bcodecconfig, CODEC_TYPE);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+            //setCodecPriority().invoke(bcodecconfig, CODEC_TYPE);
+            Class bccClass = Class.forName("android.bluetooth.BluetoothCodecConfig");
+            Class partypes[] = {Integer.TYPE,Integer.TYPE,Integer.TYPE,Integer.TYPE,Integer.TYPE,Long.TYPE,Long.TYPE,Long.TYPE,Long.TYPE};
+            Constructor ct = bccClass.getConstructor(partypes);
+            Log.i("MYAPP","CODEC_TYPE: "+CODEC_TYPE);
+            Object argList[] = {CODEC_TYPE, Codec.CODEC_PRIORITY_HIGHEST, getSAMPLE_RATE(), getBITS_PER_SAMPLE(), getCHANNEL_MODE(), getCODEC_SPECIFIC1(), getCODEC_SPECIFIC2(), getCODEC_SPECIFIC3(), getCODEC_SPECIFIC4()};
+            bcodecconfig2 = ct.newInstance(argList);
+        } catch (IllegalAccessException | InvocationTargetException | ClassNotFoundException | InstantiationException | NoSuchMethodException e) {
             e.printStackTrace();
             success = false;
         }
-        if(bcodecconfig != null) {
-            Object params[] = {(Object)getBluetoothDevice(),(Object)bcodecconfig};
-            try {
-                setCodecConfigPreference().invoke(a2dp, params);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-                success = false;
+
+
+        if(bcodecconfig2 != null) {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                Object params[] = {getBluetoothDevice(), bcodecconfig2};
+                try {
+                    setCodecConfigPreference().invoke(a2dp, params);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                    success = false;
+                }
+            }else{
+                try {
+                    setCodecConfigPreference().invoke(a2dp, bcodecconfig2);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                    success = false;
+                }
             }
         }else {
             success = false;
@@ -143,6 +173,26 @@ public class CodecController {
 
     public int getBITS_PER_SAMPLE(){
         return BITS_PER_SAMPLE;
+    }
+
+    public int getCHANNEL_MODE(){
+        return channelMode;
+    }
+
+    public long getCODEC_SPECIFIC1(){
+        return codecSpecific1;
+    }
+
+    public long getCODEC_SPECIFIC2(){
+        return codecSpecific2;
+    }
+
+    public long getCODEC_SPECIFIC3(){
+        return codecSpecific3;
+    }
+
+    public long getCODEC_SPECIFIC4(){
+        return codecSpecific4;
     }
 
     public int getCodec(){ return codec;}
@@ -269,6 +319,51 @@ public class CodecController {
     private Method getBitsPerSample(){
         try{
             return Class.forName("android.bluetooth.BluetoothCodecConfig").getDeclaredMethod("getBitsPerSample");
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private Method getChannelMode(){
+        try{
+            return Class.forName("android.bluetooth.BluetoothCodecConfig").getDeclaredMethod("getChannelMode");
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private Method getCodecSpecific1(){
+        try{
+            return Class.forName("android.bluetooth.BluetoothCodecConfig").getDeclaredMethod("getCodecSpecific1");
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private Method getCodecSpecific2(){
+        try{
+            return Class.forName("android.bluetooth.BluetoothCodecConfig").getDeclaredMethod("getCodecSpecific2");
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private Method getCodecSpecific3(){
+        try{
+            return Class.forName("android.bluetooth.BluetoothCodecConfig").getDeclaredMethod("getCodecSpecific3");
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private Method getCodecSpecific4(){
+        try{
+            return Class.forName("android.bluetooth.BluetoothCodecConfig").getDeclaredMethod("getCodecSpecific4");
         } catch (ClassNotFoundException | NoSuchMethodException e) {
             e.printStackTrace();
             return null;

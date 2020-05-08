@@ -48,10 +48,12 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
     private int CURRENT_CODEC_TYPE = -1;
     private List<Integer> listOfSelectableCodecs = new ArrayList<>();
     private Context mainContext;
+    FragmentChanger fragmentChanger;
     Toast currentToast;
 
-    public MainFragment(Context context) {
+    public MainFragment(Context context, FragmentChanger fc) {
         mainContext = context;
+        fragmentChanger = fc;
     }
 
     @Override
@@ -65,7 +67,6 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         codecController = new CodecController();
         setViewComponents(view);
-        setDefaultText();
         initiateBluetoothAdapter();
         return view;
     }
@@ -77,6 +78,7 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
             new BluetoothA2DPRequester(this).request(mainContext, mAdapter);
             Log.i("MYAPP", "Requester Requested");
         }else {
+            setDefaultText();
             /*if(mAdapter.enable()) {
                 BluetoothBroadcastReceiver.register(this, mainContext);
             }else{
@@ -147,9 +149,9 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
 
     private void setDesiredCodec(int codec_type){
         boolean one = codecController.setCodec(codec_type);
-        boolean two = getAllInfo();
-        if(one && two){
+        if(one){
             makeToast("Codec changed successfully");
+            getAllInfo();
         }else{
             makeToast("Failed to change codec");
         }
@@ -198,6 +200,14 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
             progressBar.setProgress(ProgressBarInfo.getProgress(codecController.getCodec()));
             textView4.setText(ProgressBarInfo.getText(progressBar.getProgress()));
             progressBar.setProgressTintList(ColorStateList.valueOf(ProgressBarInfo.getColor(progressBar.getProgress())));
+
+            button1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    fragmentChanger.changeFragment(codecController.getCodec());
+                }
+            });
+            button1.setEnabled(true);
 
             switch (codecController.getSAMPLE_RATE()) {
                 case Codec.SAMPLE_RATE_44100:
@@ -312,6 +322,7 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
         progressBar.setProgress(0);
         textView7.setText("None");
         textView9.setText("None");
+        button1.setEnabled(false);
         button2.setEnabled(false);
         button2.setText("No device detected");
         textView5.setText("Bluetooth Device: None");
@@ -322,9 +333,10 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
     }
 
     private void makeToast(String str){
-        currentToast.cancel();
-        currentToast.makeText(mainContext, str, Toast.LENGTH_SHORT);
-        currentToast.show();
+        //currentToast = new Toast(mainContext);
+        //currentToast.makeText(mainContext, str, Toast.LENGTH_SHORT);
+        //currentToast.show();
+        Toast.makeText(mainContext, str, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -349,5 +361,9 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
     public void onA2DPProxyReceived(BluetoothA2dp proxy){
         codecController.setA2dp(proxy);
         getAllInfo();
+    }
+
+    public static interface FragmentChanger{
+        public void changeFragment(int codec);
     }
 }

@@ -13,10 +13,12 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.material.navigation.NavigationView;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainFragment.FragmentChanger{
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mToggle;
+    NavigationView navigationView;
+    String currentFragment = "Nothing";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,12 +37,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mDrawerLayout.addDrawerListener(mToggle);
         mToggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
-                new MainFragment(this)).commit();
+                new MainFragment(this, this)).commit();
         navigationView.setCheckedItem(R.id.MainPage);
+        currentFragment = "MainPage";
     }
 
     @Override
@@ -48,7 +51,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
             mDrawerLayout.closeDrawer(GravityCompat.START);
         }else {
-            super.onBackPressed();
+            if(currentFragment=="SBC" || currentFragment=="AAC" || currentFragment=="aptX" || currentFragment=="aptX_HD" || currentFragment=="LDAC" || currentFragment=="about"){
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
+                        new MainFragment(this, this)).commit();
+                navigationView.setCheckedItem(R.id.MainPage);
+                currentFragment="MainPage";
+            }else{
+                super.onBackPressed();
+            }
         }
     }
 
@@ -62,40 +72,88 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (item.getItemId()){
             case R.id.MainPage:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
-                        new MainFragment(this)).commit();
+                        new MainFragment(this, this)).commit();
                 mDrawerLayout.closeDrawer(GravityCompat.START);
+                currentFragment="MainPage";
                 break;
             case R.id.SBC:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
                         new SbcInfoFragment()).commit();
                 mDrawerLayout.closeDrawer(GravityCompat.START);
+                currentFragment="SBC";
                 break;
             case R.id.AAC:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
                         new AacInfoFragment()).commit();
                 mDrawerLayout.closeDrawer(GravityCompat.START);
+                currentFragment="AAC";
                 break;
             case R.id.aptX:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
                         new aptXInfoFragment()).commit();
                 mDrawerLayout.closeDrawer(GravityCompat.START);
+                currentFragment="aptX";
                 break;
             case R.id.aptX_HD:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
                         new aptXHDInfoFragment()).commit();
                 mDrawerLayout.closeDrawer(GravityCompat.START);
+                currentFragment="aptX_HD";
                 break;
             case R.id.LDAC:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
                         new LdacInfoFragment()).commit();
                 mDrawerLayout.closeDrawer(GravityCompat.START);
+                currentFragment="LDAC";
                 break;
             case R.id.about:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
                         new AboutAppFragment()).commit();
                 mDrawerLayout.closeDrawer(GravityCompat.START);
+                currentFragment="about";
                 break;
         }
         return true;
+    }
+
+    @Override
+    public void changeFragment(int codec) {
+        switch (codec){
+            case Codec.SOURCE_CODEC_TYPE_SBC:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
+                        new SbcInfoFragment()).commit();
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+                navigationView.setCheckedItem(R.id.SBC);
+                currentFragment="SBC";
+                break;
+            case Codec.SOURCE_CODEC_TYPE_AAC:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
+                        new AacInfoFragment()).commit();
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+                navigationView.setCheckedItem(R.id.AAC);
+                currentFragment="AAC";
+                break;
+            case Codec.SOURCE_CODEC_TYPE_APTX:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
+                        new aptXInfoFragment()).commit();
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+                navigationView.setCheckedItem(R.id.aptX);
+                currentFragment="aptX";
+                break;
+            case Codec.SOURCE_CODEC_TYPE_APTX_HD:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
+                        new aptXHDInfoFragment()).commit();
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+                navigationView.setCheckedItem(R.id.aptX_HD);
+                currentFragment="aptX_HD";
+                break;
+            case Codec.SOURCE_CODEC_TYPE_LDAC:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
+                        new LdacInfoFragment()).commit();
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+                navigationView.setCheckedItem(R.id.LDAC);
+                currentFragment="LDAC";
+                break;
+        }
     }
 }

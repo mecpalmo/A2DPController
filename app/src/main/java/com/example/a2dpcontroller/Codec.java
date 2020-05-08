@@ -22,6 +22,8 @@ public class Codec {
     public static final int BITS_PER_SAMPLE_24   = 0x1 << 1;
     public static final int BITS_PER_SAMPLE_32   = 0x1 << 2;
 
+    public static final int CODEC_PRIORITY_HIGHEST = 1000 * 1000;
+
     Codec(){ }
 
     public static String getCodecName(int mCodecType) {
