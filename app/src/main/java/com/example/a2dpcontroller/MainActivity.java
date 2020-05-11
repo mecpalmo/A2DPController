@@ -1,6 +1,8 @@
 package com.example.a2dpcontroller;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.MenuItem;
 import androidx.appcompat.widget.Toolbar;
 
@@ -9,6 +11,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.navigation.NavigationView;
 
@@ -17,8 +20,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mToggle;
-    NavigationView navigationView;
-    String currentFragment = "Nothing";
+    private NavigationView navigationView;
+    private String currentFragment = "Nothing";
+    private SwipeRefreshLayout swipeLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +36,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        swipeLayout = findViewById(R.id.swipeLayout);
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Log.i("MYAPP", "Start refreshing");
+                if(currentFragment=="MainPage"){
+                    setMainFragment();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            swipeLayout.setRefreshing(false);
+                        }
+                    },1500);
+                }else{
+                    swipeLayout.setRefreshing(false);
+                }
+            }
+        });
+
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         mToggle = new ActionBarDrawerToggle(this, mDrawerLayout,toolbar,R.string.open,R.string.close);
         mDrawerLayout.addDrawerListener(mToggle);
@@ -40,6 +63,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        setMainFragment();
+    }
+
+    private void setMainFragment(){
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
                 new MainFragment(this, this)).commit();
         navigationView.setCheckedItem(R.id.MainPage);

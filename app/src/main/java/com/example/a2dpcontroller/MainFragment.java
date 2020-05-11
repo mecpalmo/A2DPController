@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,6 +66,7 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
+        Log.i("MYAPP", "MainFragment OnCreate Called");
         codecController = new CodecController();
         setViewComponents(view);
         initiateBluetoothAdapter();
@@ -73,10 +75,8 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
 
     public void initiateBluetoothAdapter(){
         mAdapter = BluetoothAdapter.getDefaultAdapter();
-        Log.i("MYAPP", "got the adapter");
         if (mAdapter.isEnabled()) {
             new BluetoothA2DPRequester(this).request(mainContext, mAdapter);
-            Log.i("MYAPP", "Requester Requested");
         }else {
             setDefaultText();
             /*if(mAdapter.enable()) {
@@ -151,7 +151,14 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
         boolean one = codecController.setCodec(codec_type);
         if(one){
             makeToast("Codec changed successfully");
-            getAllInfo();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getAllInfo();
+                }
+            },800);
+
+            //getAllInfo();
         }else{
             makeToast("Failed to change codec");
         }

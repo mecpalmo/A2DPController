@@ -3,7 +3,6 @@ package com.example.a2dpcontroller;
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothDevice;
 import android.os.Build;
-import android.util.Log;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -135,7 +134,6 @@ public class CodecController {
             Class bccClass = Class.forName("android.bluetooth.BluetoothCodecConfig");
             Class partypes[] = {Integer.TYPE,Integer.TYPE,Integer.TYPE,Integer.TYPE,Integer.TYPE,Long.TYPE,Long.TYPE,Long.TYPE,Long.TYPE};
             Constructor ct = bccClass.getConstructor(partypes);
-            Log.i("MYAPP","CODEC_TYPE: "+CODEC_TYPE);
             Object argList[] = {CODEC_TYPE, Codec.CODEC_PRIORITY_HIGHEST, getSAMPLE_RATE(), getBITS_PER_SAMPLE(), getCHANNEL_MODE(), getCODEC_SPECIFIC1(), getCODEC_SPECIFIC2(), getCODEC_SPECIFIC3(), getCODEC_SPECIFIC4()};
             bcodecconfig2 = ct.newInstance(argList);
         } catch (IllegalAccessException | InvocationTargetException | ClassNotFoundException | InstantiationException | NoSuchMethodException e) {
