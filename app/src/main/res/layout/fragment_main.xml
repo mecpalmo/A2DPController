@@ -12,7 +12,6 @@
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_marginEnd="40dp"
-        android:layout_marginTop="60dp"
         android:background="@drawable/button1style"
         android:text="i"
         android:textAlignment="center"
@@ -21,7 +20,7 @@
         android:textSize="22dp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/textView1" />
 
     <Button
         android:id="@+id/button2"

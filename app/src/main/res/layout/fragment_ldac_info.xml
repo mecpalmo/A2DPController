@@ -1,15 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="20dp"
     tools:context=".LdacInfoFragment">
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="200dp"
+        android:layout_height="80dp"
+        android:src="@drawable/ldac_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LDAC is a Codec" />
+        android:layout_marginTop="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        android:text="LDAC is a codec developed bz SONY. It delivers up to
+990 kbps which is the highest values of bitrate considering all 5 A2DP
+codecs. LDAC is used only by various SONY bluetooth audio products. In theory
+its practical quality is comparable with aptX HD.
+\n\nLDAC is a lossy codec as it uses Modified Discrete Cosine Transform. DCT
+is a coding process including quantization which is executed most significantly
+on high-frequency data components (not high-frequency sound parts) which humans
+ears are suppose to be less sensible for. The 'Modification' in DCT is an
+addition to DCT, a process of overlapping which is suppose to save some part of
+data that is being lost during pure DCT.
+\n\nApart from 990 kbps, LDAC also works with 660 kbps and 330 kbps bitrates.
+Device is being switched between those 3 modes depending on connection strength.
+The lowest mode offers poor bitrate comparable with SBC."/>
 
-</FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

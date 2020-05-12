@@ -10,6 +10,26 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="This App is Awesome" />
+        android:text="This App was created as a part of master thesis by Maciej Palmowski,
+a student on Warsaw University of Technology in Poland.
+\n\nThis app allows users
+manipulate the codec of A2DP Profile which is used during a connection with a bluetooth
+audio device. Every codec delivers different level of audio quality, therefore switching
+the codec with this app, can bring you better experience while using your wireless audio
+device.
+\n\nOn the main screen you are able to check currently active codec and its details
+such as sample rate or bits per sample, as they are displayed at the left top of the
+screen. The subjective level of quality is represented by the level of bar filling, which
+is positioned below. The level of bar filling for each codecs comes from interpreting
+the results of the research made with participants rating tracks that were simulated with
+mentioned codec. This research was also realised as another part of the master thesis.
+\n\nYou are also able to change the codec automatically for the
+best one possible with your current wireless audio device by clicking the button at the
+bottom. Furthermore it is possible to change the codec for the specific one by clicking
+the frame containing the list of all supported codecs by your devices.
+\n\nYou can learn about detailed codecs' specifications by checking the side bar menu
+that can be drawn out from the left side of the screen.
+\n\nNote that codecs' impact on the audio quality comes only with bluetooth audio
+transmission and doesn't apply to situation of using wire for audio listening." />
 
 </FrameLayout>
