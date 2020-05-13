@@ -7,6 +7,7 @@
             android:icon="@drawable/ic_settings_black_24dp"/>
         <item android:title="Learn more">
             <menu>
+                <group android:checkableBehavior="single">
                 <item
                     android:id="@+id/SBC"
                     android:title="SBC"
@@ -27,6 +28,7 @@
                     android:id="@+id/LDAC"
                     android:title="LDAC"
                     android:icon="@drawable/ic_info_outline_black_24dp"/>
+                </group>
             </menu>
         </item>
         <item

@@ -79,10 +79,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             mDrawerLayout.closeDrawer(GravityCompat.START);
         }else {
             if(currentFragment=="SBC" || currentFragment=="AAC" || currentFragment=="aptX" || currentFragment=="aptX_HD" || currentFragment=="LDAC" || currentFragment=="about"){
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
-                        new MainFragment(this, this)).commit();
-                navigationView.setCheckedItem(R.id.MainPage);
-                currentFragment="MainPage";
+                setMainFragment();
             }else{
                 super.onBackPressed();
             }
@@ -102,42 +99,49 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         new MainFragment(this, this)).commit();
                 mDrawerLayout.closeDrawer(GravityCompat.START);
                 currentFragment="MainPage";
+                navigationView.setCheckedItem(R.id.MainPage);
                 break;
             case R.id.SBC:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
                         new SbcInfoFragment()).commit();
                 mDrawerLayout.closeDrawer(GravityCompat.START);
                 currentFragment="SBC";
+                navigationView.setCheckedItem(R.id.SBC);
                 break;
             case R.id.AAC:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
                         new AacInfoFragment()).commit();
                 mDrawerLayout.closeDrawer(GravityCompat.START);
                 currentFragment="AAC";
+                navigationView.setCheckedItem(R.id.AAC);
                 break;
             case R.id.aptX:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
                         new aptXInfoFragment()).commit();
                 mDrawerLayout.closeDrawer(GravityCompat.START);
                 currentFragment="aptX";
+                navigationView.setCheckedItem(R.id.aptX);
                 break;
             case R.id.aptX_HD:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
                         new aptXHDInfoFragment()).commit();
                 mDrawerLayout.closeDrawer(GravityCompat.START);
                 currentFragment="aptX_HD";
+                navigationView.setCheckedItem(R.id.aptX_HD);
                 break;
             case R.id.LDAC:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
                         new LdacInfoFragment()).commit();
                 mDrawerLayout.closeDrawer(GravityCompat.START);
                 currentFragment="LDAC";
+                navigationView.setCheckedItem(R.id.LDAC);
                 break;
             case R.id.about:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_view_tag,
                         new AboutAppFragment()).commit();
                 mDrawerLayout.closeDrawer(GravityCompat.START);
                 currentFragment="about";
+                navigationView.setCheckedItem(R.id.about);
                 break;
         }
         return true;

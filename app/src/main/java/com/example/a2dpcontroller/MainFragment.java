@@ -79,9 +79,8 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
             new BluetoothA2DPRequester(this).request(mainContext, mAdapter);
         }else {
             setDefaultText();
-            /*if(mAdapter.enable()) {
-                BluetoothBroadcastReceiver.register(this, mainContext);
-            }else{
+            BluetoothBroadcastReceiver.register(this, mainContext);
+            /*}else{
                 setDefaultText();
                 makeToast("Cannot Enable Bluetooth");
             }*/
