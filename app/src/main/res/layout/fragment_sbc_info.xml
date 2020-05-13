@@ -10,5 +10,20 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SBC is a codec" />
+        android:text="SBC - subband codec, specified by the Bluetooth
+Special Interest Group. SBC is a default codec for A2DP and it's
+always supported by any bluetooth audio device such as headphones,
+speakers, etc. and smartphones that use A2DP.
+\n\nSBC with its 345 kbps bitrate for stereo stream can deliver audio
+with up to 48 kHz sampling frequency and usually 16 bits per sample. SBC is
+of course a lossy codec as it is based on MPEG-1 Audio Layer II
+standard and it uses adaptive bit allocation algorithm in combination
+with adaptive block PCM quantizer. SBC's practical quality can be
+compared with .mp3 format.
+\n\nSubband coding involves breaking a signal into a 4 or 8 frequency
+bands that are being processed independently by the encoder. This process
+brings significant compression potential in many compression
+techniques. During SBC coding psychoacoustic model is being used as some
+parts of the sound, that human ear is not suppose to hear clearly,are
+being filtered out."/>
 </FrameLayout>

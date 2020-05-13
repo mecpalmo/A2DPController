@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         public void run() {
                             swipeLayout.setRefreshing(false);
                         }
-                    },1500);
+                    },1200);
                 }else{
                     swipeLayout.setRefreshing(false);
                 }

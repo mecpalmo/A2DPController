@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,5 +11,30 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="AAC is a Codec" />
-</FrameLayout>
+        android:layout_marginTop="30dp"
+        android:text="AAC - Advanced Audio Coding is a lossy compression
+standard. AAC is a part of MPEG-2 and MPEG-4 specifications. It uses
+Modified Discrete Cosine Transform, achieving better quality than .mp3
+format while keeping similar bitrate.
+\n\nWhile DCT is a coding process including quantization which is
+executed most significantly on high-frequency data components (not
+high-frequency sound parts) which humans ears are suppose to be less
+sensible for, the 'Modification' in DCT is an addition to DCT, a process
+of overlapping which is suppose to save some part of data that is being
+lost during pure DCT.
+\n\nAAC is a very flexible codec as it is able to achieve up to 96 kHz
+sampling rate and up 48 channels depending on the implementation, but
+using your smartphone and average bluetooth audio device you will gain
+decent (2-channel 44.1 kHz sampling frequency) audio quality."
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="180dp"
+        android:layout_height="220dp"
+        android:src="@drawable/aac_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

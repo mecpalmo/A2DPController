@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,6 +11,26 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="aptX is a Codec" />
+        android:layout_marginTop="30dp"
+        android:text="aptX is a lossy data compression format held by Qualcomm.
+With its 352 kbps bitrate aptX delivers decent quality audio with up to 48kHz
+sampling frequency and 16 bits per sample.
+\n\naptX's main trait is that it doesn't use psychoacoustic auditory masking
+techniques, so the project of this codec doesn't assume default incapabilities
+of human ear to be able to hear some parts of sound. aptX uses Adaptive
+Differential Pulse-Code Modulation. This process involves quantization which is
+the cause for losing some parts of the data. The Adaptation in this process in
+an addition to pure DPCM, which is suppose to vary the size of the quantization
+step in order to decrease loss of significant parts of the data."
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
-</FrameLayout>
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="300dp"
+        android:layout_height="120dp"
+        android:src="@drawable/aptx_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
