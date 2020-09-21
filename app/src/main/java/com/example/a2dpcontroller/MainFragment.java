@@ -2,6 +2,7 @@ package com.example.a2dpcontroller;
 
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
@@ -74,16 +75,18 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
     }
 
     public void initiateBluetoothAdapter(){
+
         mAdapter = BluetoothAdapter.getDefaultAdapter();
+
         if (mAdapter.isEnabled()) {
-            new BluetoothA2DPRequester(this).request(mainContext, mAdapter);
+            if(mAdapter.getProfileConnectionState(BluetoothProfile.A2DP)==BluetoothAdapter.STATE_CONNECTED){
+                new BluetoothA2DPRequester(this).request(mainContext, mAdapter);
+            }else{
+                setDefaultText();
+            }
         }else {
             setDefaultText();
-            BluetoothBroadcastReceiver.register(this, mainContext);
-            /*}else{
-                setDefaultText();
-                makeToast("Cannot Enable Bluetooth");
-            }*/
+            //BluetoothBroadcastReceiver.register(this, mainContext);
         }
     }
 
@@ -253,6 +256,7 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
             }
 
             List<Integer> localCodecs = codecController.getLocalCodecs();
+
             setLocalCodecs(localCodecs);
 
             List<Integer> selectableCodecs = codecController.getSelectableCodecs();
@@ -290,12 +294,24 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
     public void setLocalCodecs(List<Integer> list) {
         String str = "";
         if (list.size() > 0) {
-            for (int item : list) {
-                if(item>= Codec.SOURCE_CODEC_TYPE_SBC && item<=Codec.SOURCE_CODEC_TYPE_LDAC) {
-                    str = str + Codec.getCodecName(item) + ", ";
-                }
+            if(list.contains(Codec.SOURCE_CODEC_TYPE_SBC)){
+                str = str + Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_SBC) + ", ";
             }
-            str = str.substring(0, str.length() - 2);
+            if(list.contains(Codec.SOURCE_CODEC_TYPE_AAC)){
+                str = str + Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_AAC) + ", ";
+            }
+            if(list.contains(Codec.SOURCE_CODEC_TYPE_APTX)){
+                str = str + Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_APTX) + ", ";
+            }
+            if(list.contains(Codec.SOURCE_CODEC_TYPE_APTX_HD)){
+                str = str + Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_APTX_HD) + ", ";
+            }
+            if(list.contains(Codec.SOURCE_CODEC_TYPE_LDAC)){
+                str = str + Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_LDAC) + ", ";
+            }
+            if(str.length()>=2) {
+                str = str.substring(0, str.length() - 2);
+            }
         } else{
             str = "not found";
         }
@@ -306,12 +322,24 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
     public void setSelectableCodecs(List<Integer> list){
         String str = "";
         if (list.size() > 0) {
-            for (int item : list) {
-                if(item>= Codec.SOURCE_CODEC_TYPE_SBC && item<=Codec.SOURCE_CODEC_TYPE_LDAC) {
-                    str = str + Codec.getCodecName(item) + ", ";
-                }
+            if(list.contains(Codec.SOURCE_CODEC_TYPE_SBC)){
+                str = str + Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_SBC) + ", ";
             }
-            str = str.substring(0, str.length() - 2);
+            if(list.contains(Codec.SOURCE_CODEC_TYPE_AAC)){
+                str = str + Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_AAC) + ", ";
+            }
+            if(list.contains(Codec.SOURCE_CODEC_TYPE_APTX)){
+                str = str + Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_APTX) + ", ";
+            }
+            if(list.contains(Codec.SOURCE_CODEC_TYPE_APTX_HD)){
+                str = str + Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_APTX_HD) + ", ";
+            }
+            if(list.contains(Codec.SOURCE_CODEC_TYPE_LDAC)){
+                str = str + Codec.getCodecName(Codec.SOURCE_CODEC_TYPE_LDAC) + ", ";
+            }
+            if(str.length()>=2) {
+                str = str.substring(0, str.length() - 2);
+            }
         } else{
             str = "not found";
         }
@@ -371,5 +399,66 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
 
     public static interface FragmentChanger{
         public void changeFragment(int codec);
+    }
+
+    //metoda do testowania
+    public void setCodec(){
+        setDefaultText();
+        NONE = false;
+        int codec = 3;
+        textView1.setText(Codec.getCodecName(codec));
+        CURRENT_CODEC_TYPE = codec;
+        progressBar.setProgress(ProgressBarInfo.getProgress(codec));
+        textView4.setText(ProgressBarInfo.getText(progressBar.getProgress()));
+        progressBar.setProgressTintList(ColorStateList.valueOf(ProgressBarInfo.getColor(progressBar.getProgress())));
+
+        button1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        button1.setEnabled(false);
+
+        switch (Codec.SAMPLE_RATE_44100) {
+            case Codec.SAMPLE_RATE_44100:
+                textView2.setText("Sample Rate: 44100 Hz");
+                break;
+            case Codec.SAMPLE_RATE_48000:
+                textView2.setText("Sample Rate: 48000 Hz");
+                break;
+            case Codec.SAMPLE_RATE_88200:
+                textView2.setText("Sample Rate: 88200 Hz");
+                break;
+            case Codec.SAMPLE_RATE_96000:
+                textView2.setText("Sample Rate: 96000 Hz");
+                break;
+            case Codec.SAMPLE_RATE_176400:
+                textView2.setText("Sample Rate: 176400 Hz");
+                break;
+            case Codec.SAMPLE_RATE_192000:
+                textView2.setText("Sample Rate: 192000 Hz");
+                break;
+            default:
+                textView2.setText("Sample Rate: None");
+        }
+
+        switch (Codec.BITS_PER_SAMPLE_16) {
+            case Codec.BITS_PER_SAMPLE_16:
+                textView3.setText("Bits Per Sample: 16");
+                break;
+            case Codec.BITS_PER_SAMPLE_24:
+                textView3.setText("Bits Per Sample: 24");
+                break;
+            case Codec.BITS_PER_SAMPLE_32:
+                textView3.setText("Bits Per Sample: 32");
+                break;
+            default:
+                textView3.setText("Bits Per Sample: None");
+        }
+
+        button2.setEnabled(false);
+        button2.setText("Increase Codec Quality");
+        textView5.setText("Bluetooth Device: Unknown");
     }
 }

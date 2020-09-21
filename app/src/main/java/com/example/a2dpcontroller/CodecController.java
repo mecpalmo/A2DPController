@@ -33,6 +33,10 @@ public class CodecController {
         a2dp = setter;
     }
 
+    public static void clearObjects(){
+        a2dp = null;
+    }
+
     public boolean getCurrentCodec(){
         boolean success = true;
         Object bcodecstatus;
@@ -203,7 +207,8 @@ public class CodecController {
         try{
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
             {
-                return BluetoothA2dp.class.getDeclaredMethod("getCodecStatus", BluetoothDevice.class);
+                return BluetoothA2dp.class.getDeclaredMethod("getCodecStatus",
+                        BluetoothDevice.class);
             }else {
                 return BluetoothA2dp.class.getDeclaredMethod("getCodecStatus");
             }
