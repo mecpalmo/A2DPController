@@ -10,8 +10,8 @@
     <Button
         android:id="@+id/button1"
         style="@style/Widget.AppCompat.Button"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginEnd="25dp"
         android:background="@drawable/button1style"
         android:fontFamily="serif"
@@ -28,42 +28,30 @@
     <Button
         android:id="@+id/button2"
         android:layout_width="0dp"
-        android:layout_height="55dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHeight_min="50dp"
         android:layout_marginEnd="10dp"
         android:layout_marginStart="10dp"
-        android:layout_marginBottom="40dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:background="@drawable/button2style"
         android:text="Increase Codec Quality"
         android:textAllCaps="false"
         android:textColor="#FFFFFF"
-        android:textSize="22dp"
+        android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/codec_box" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="15dp"
-        android:max="100"
-        android:progress="50"
-        android:layout_marginTop="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
-
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Sample Rate:  44100 Hz"
-        android:textSize="18dp"
-        android:layout_marginTop="15dp"
+        android:textSize="16sp"
+        android:layout_marginTop="10dp"
         app:layout_constraintStart_toStartOf="@+id/textView1"
         app:layout_constraintTop_toBottomOf="@+id/textView1" />
 
@@ -71,10 +59,10 @@
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="0dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:text="Bits Per Sample: 16"
-        android:textSize="18dp"
+        android:textSize="16sp"
         app:layout_constraintStart_toStartOf="@+id/textView1"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
@@ -85,37 +73,38 @@
         android:layout_marginStart="25dp"
         android:text="aptX"
         android:textAlignment="center"
-        android:textSize="60dp"
-        android:layout_marginTop="15dp"
+        android:textSize="50sp"
+        android:layout_marginTop="10dp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
+    <include
+        android:id="@+id/progressbox"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="25dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="5dp"
-        android:text="Quality: Good"
-        android:textSize="18dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+        android:layout_width="match_parent"
+        android:layout_marginEnd="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        layout="@layout/progress_box"
+        app:layout_constraintTop_toBottomOf="@id/textView3"
+        app:layout_constraintBottom_toTopOf="@id/codec_box"/>
 
     <include
         android:id="@+id/codec_box"
         layout="@layout/codec_list_box"
         android:layout_width="0dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="0dp"
-        android:layout_height="250dp"
         android:layout_marginEnd="5dp"
         android:layout_marginStart="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintBottom_toTopOf="@+id/button2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progressBar"/>
+        app:layout_constraintTop_toBottomOf="@+id/progressbox"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_max="250dp"/>
 
     <Button
         android:id="@+id/button3"
@@ -131,8 +120,8 @@
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18dp"
-        android:layout_marginTop="15dp"
+        android:textSize="16sp"
+        android:layout_marginTop="5dp"
         android:text="Bluetooth Device: My Headphones"
         app:layout_constraintStart_toStartOf="@+id/textView1"
         app:layout_constraintTop_toTopOf="parent" />
