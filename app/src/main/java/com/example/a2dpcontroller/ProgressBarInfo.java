@@ -5,9 +5,9 @@ import android.graphics.Color;
 public class ProgressBarInfo {
 
     public static final int MAX_VALUE_QUALITY = 100;
-    public static final int SBC_QUALITY = 70;
-    public static final int AAC_QUALITY = 82;
-    public static final int APTX_QUALITY = 87;
+    public static final int SBC_QUALITY = 68;
+    public static final int AAC_QUALITY = 85;
+    public static final int APTX_QUALITY = 88;
     public static final int APTXHD_QUALITY = 100;
     public static final int LDAC_QUALITY = 0;
 
