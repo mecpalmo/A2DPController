@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:text="Local Codecs:"
+        android:layout_marginTop="5dp"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/textView7"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,7 +25,7 @@
         android:layout_marginStart="20dp"
         android:text="None"
         android:textSize="16sp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView6"
         app:layout_constraintBottom_toTopOf="@+id/textView8"/>
@@ -32,7 +33,7 @@
     <TextView
         android:id="@+id/textView8"
         android:layout_width="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="8dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:text="Audio Device Codecs:"
@@ -47,6 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:text="None"
+        android:layout_marginBottom="5dp"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView8"

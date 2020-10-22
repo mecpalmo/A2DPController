@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainFragment extends Fragment implements BluetoothBroadcastReceiver.Callback, BluetoothA2DPRequester.Callback{
+public class MainFragment extends Fragment implements BluetoothA2DPRequester.Callback{
 
     private static final String TAG = "MyApp";
     private BluetoothAdapter mAdapter;
@@ -86,7 +86,6 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
             }
         }else {
             setDefaultText();
-            //BluetoothBroadcastReceiver.register(this, mainContext);
         }
     }
 
@@ -374,21 +373,9 @@ public class MainFragment extends Fragment implements BluetoothBroadcastReceiver
     }
 
     @Override
-    public void onBluetoothConnected() {
-        initiateBluetoothAdapter();
-    }
-
-    @Override
-    public void onBluetoothError() {
-        setDefaultText();
-        makeToast("Error has occured");
-    }
-
-    @Override
     public void onBluetoothDisconnected() {
         setDefaultText();
         makeToast("Device disconnected");
-        BluetoothBroadcastReceiver.register(this, mainContext);
     }
 
     @Override
